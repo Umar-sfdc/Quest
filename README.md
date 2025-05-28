@@ -1,1 +1,1 @@
-![Quest](https://github.com/Umar-sfdc/Quest/blob/f9d9e7941349ed43eeedae8db58fc1c80856abd3/Quest.gif)
+![Quest](https://github.com/Umar-sfdc/Quest/blob/0db5b23dde7a0d94c710e14ee5d3a6977a6f7cf6/Salesforce%20Quest.png)
