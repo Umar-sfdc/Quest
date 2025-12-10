@@ -1625,8 +1625,3 @@ INCLUDE("Troubleshooting_Steps")
 ```
 
 ---
-
-If you want, I can now:
-
-- Turn this into a **Markdown file** you can drop straight into GitHub, or
-- Generate a **PDF-style layout** (via Markdown or code) ready for printing or sharing.
