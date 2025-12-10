@@ -1,17 +1,30 @@
-# **Formulas, Validation Rules, and Lookup Filters**
+# Formulas, Validation Rules, and Lookup Filters – Reference
 
-## **Math Operators**
+## 1. Operators
 
-- **Addition (+)**
-- **Subtraction (-)**
-- **Multiplication (\*)**
-- **Division (/)**
-- **Parentheses ()** --> Used to group expressions. Expressions inside parentheses are evaluated first.
-- **Exponentiation (^)** --> Raises a number to a power of a specified number.
+### 1.1 Math Operators
+
+- **Addition (+)** – Adds two numbers.
+- **Subtraction (-)** – Subtracts one number from another.
+- **Multiplication (\*)** – Multiplies numbers.
+- **Division (/)** – Divides one number by another.
+- **Parentheses ()** – Group expressions; inside parentheses is evaluated first.
+- **Exponentiation (^)** – Raises a number to the power of another number.
+
+**Examples**
+
+```java
+Amount__c + Tax__c
+Discount__c - 10
+Quantity__c * UnitPrice__c
+Total__c / 12
+(Amount__c + Tax__c) * 0.18
+Power__c ^ 2
+```
 
 ---
 
-## **Logical Operators**
+### 1.2 Logical Operators
 
 - **Equal To (==, ===)**
 - **Not Equal To (!=, <>)**
@@ -22,1041 +35,641 @@
 - **AND (&&)**
 - **OR (||)**
 
+**Examples**
+
+```java
+Amount__c >= 1000
+StageName == "Closed Won"
+(Amount__c > 1000) && (Discount__c > 0)
+(ISBLANK(Email) || ISBLANK(Phone))
+```
+
 ---
 
-## **Text Operators**
+### 1.3 Text Operators
 
-### Concatenate (&, +)
+#### Concatenation (&, +)
 
 Used to combine multiple text values.
 
 ```java
+"Expense-" & Trip_Name__c & "-" & ExpenseNum__c
 
-  "Expense-" & Trip_Name__c & "-" & ExpenseNum__c
-
+Account.Name & " (" & TEXT(Industry) & ")"
 ```
+
+> Note: In Salesforce formulas, `&` is the standard text concatenation operator. `+` is primarily numeric.
 
 ---
 
-## **Date and Time Functions**
+## 2. Date and Time Functions
 
-### ADDMONTHS(date, number_of_months)
+---
 
-Returns a date that is the specified number of months before or after the given date.
+### 2.1 ADDMONTHS(date, number_of_months)
 
-**Examples:**
+**Definition**
+Returns a date that is the given number of months before or after a specified date.
+
+**Key Points**
+
+- If the starting date is the last day of a month, the result is adjusted to the last day of the resulting month.
+- Works with Date values.
+
+**Examples**
 
 ```java
-ADDMONTHS(20 September 2025, 5) = 20 February 2026
-ADDMONTHS(30 September 2025, 5) = 28 February 2026
+ADDMONTHS(DATE(2025, 9, 20), 5)
+// Output: 2026-02-20
 ```
-
-**Notes:**
-
-- If a date falls on the last day of a month, the result is adjusted to the last day of the resulting month.
-
----
-
-### Date(year, month, day)
-
-Returns a date value from the year, month, and day values you enter. Salesforce displays an error on the detail page if the value of the DATE function in a formula field is an invalid date, such as February 29 in a non-leap year.
 
 ```java
-
-DATE(2025, 02, 20) Creates a Date Field of February 02, 2025
+ADDMONTHS(DATE(2025, 9, 30), 5)
+// Output: 2026-02-28 (adjusted to last day)
 ```
-
----
-
-### DATEVALUE(expression)
-
-DATEVALUE(expression) and replace expression with a date/time or text value, merge field, or expression.
-
-**Notes**
-
-    If the field referenced in the function isn't a valid text or date/time field, the formula field displays #ERROR!
-    When entering a date, surround the date with quotes and use this format: YYYY-MM-DD, that is, a four-digit year, two-digit month, and two-digit day.
-    If the expression doesn't match valid date ranges, such as the MM isn't between 01 and 12, the formula field displays #ERROR!
-    Dates and times are always calculated using the user’s time zone, except in list views, reports, and related lists. These items calculate dates and times using Coordinated Universal Time.
 
 ```java
-DATEVALUE("2005-11-15") returns November 15, 2005 as a date value.
+ADDMONTHS(CloseDate, -3)
+// Output: date three months before CloseDate
 ```
 
-    > Note : Dates and times are always calculated using the user’s time zone, except in list views, reports, and related lists. These items calculate dates and times using Coordinated Universal Time.
+**Tips**
+
+- Useful for subscription, contract end dates, and follow-up schedules.
+
+**Limitations**
+
+- Day adjustments may surprise you when starting from end-of-month dates.
 
 ---
 
-### DATETIMEVALUE(expression)
+### 2.2 DATE(year, month, day)
 
-DATETIMEVALUE(expression) and replace expression with a date/time or text value, merge field, or expression.
+**Definition**
+Returns a Date value from numeric year, month, and day.
 
-**Notes**
+**Key Points**
 
-    - DATETIMEVALUE is always calculated using GMT time zone and can’t be changed.
-    - When entering a specific date, surround the date with quotes and use the following format: YYYY-MM-DD, that is, a four-digit year, two-digit month, and two-digit day.
-    - If the expression doesn't match valid date ranges, such as the MM isn't between 01 and 12, the formula field displays #ERROR!
+- If the resulting date is invalid (for example, 29 Feb in a non-leap year), the formula errors.
+- Year must be four digits for clarity.
 
-Closed Date Example,
+**Examples**
 
 ```java
-DATETIMEVALUE("2005-11-15 17:00:00") returns November 15, 2005 5:00 PM GMT as a date and time value.
+DATE(2025, 2, 20)
+// Output: 2025-02-20
 ```
 
+```java
+DATE(YEAR(TODAY()), 12, 31)
+// Output: Last day of current year
+```
+
+```java
+DATE(2024, 2, 29)
+// Valid leap year date
+```
+
+**Tips**
+
+- Use with YEAR, MONTH, and DAY to rebuild or adjust dates.
+
+**Limitations**
+
+- Invalid combinations cause formula errors.
+
 ---
 
-Here you go — I’ve filled in **all the remaining functions** and added **2–3 examples for each**, including **what the output looks like and its data type**. I’ve kept your style and headings.
+### 2.3 DATEVALUE(expression)
 
----
+**Definition**
+Converts a Date/Time or text expression into a Date value (no time).
 
-### DATEVALUE(expression)
+**Key Points**
 
-`DATEVALUE(expression)`
-Converts a **Date/Time or text** expression into a **Date** value (`YYYY-MM-DD`).
+- Text must be in `YYYY-MM-DD` format when typed as a literal.
+- Uses the user’s time zone when converting from Date/Time.
+- Invalid expressions show `#ERROR!`.
 
-**Key points**
-
-- Works with text like `"2025-12-10"` or a Date/Time field like `CreatedDate`.
-- If expression is invalid (wrong format / impossible date), formula shows `#ERROR!`
-- Uses **user’s timezone** when converting a Date/Time.
+**Examples**
 
 ```java
 DATEVALUE("2005-11-15")
-// Output (Date): 2005-11-15
+// Output: 2005-11-15
 ```
 
 ```java
 DATEVALUE(CloseDateTime__c)
 // If CloseDateTime__c = 2025-12-10 15:30
-// Output (Date): 2025-12-10
+// Output: 2025-12-10
 ```
 
 ```java
 DATEVALUE("2024-02-29")
-// Output (Date): 2024-02-29   // 2024 is a leap year
+// Output: 2024-02-29
 ```
+
+**Tips**
+
+- Use to strip time from Date/Time fields for date-only calculations.
+
+**Limitations**
+
+- Wrong format or impossible dates (like 2025-13-40) cause errors.
 
 ---
 
-### DATETIMEVALUE(expression)
+### 2.4 DATETIMEVALUE(expression)
 
-`DATETIMEVALUE(expression)`
-Converts a **Date or text** expression into a **Date/Time** value.
+**Definition**
+Converts a Date or text expression into a Date/Time value.
 
-**Key points**
+**Key Points**
 
-- Always calculated in **GMT (UTC)** internally.
-- Date-only input becomes midnight GMT of that date, then shown in user’s timezone.
-- Invalid expressions give `#ERROR!`.
+- Calculated in GMT (UTC) internally.
+- Date-only input is treated as midnight GMT, then displayed in user’s time zone.
+- Invalid expressions cause `#ERROR!`.
+
+**Examples**
 
 ```java
 DATETIMEVALUE("2005-11-15 17:00:00")
-// Output (Date/Time, GMT): 2005-11-15 17:00:00
-// Shown to user adjusted to their timezone.
+// Output: 2005-11-15 17:00:00 (GMT)
 ```
 
 ```java
 DATETIMEVALUE("2025-01-01 09:30:00")
-// Output (Date/Time): 2025-01-01 09:30:00 (GMT)
+// Output: 2025-01-01 09:30:00 (GMT)
 ```
 
 ```java
 DATETIMEVALUE(TODAY())
-// If TODAY() = 2025-12-10
-// Output (Date/Time, GMT): 2025-12-10 00:00:00
-// Shown shifted to user timezone.
+// Output: [today’s date] 00:00:00 (GMT)
 ```
+
+**Tips**
+
+- Use when you must convert text or date fields into Date/Time for time-based calculations.
+
+**Limitations**
+
+- Only accepts valid Date/Time strings.
 
 ---
 
-### DAY(date)
+### 2.5 DAY(date)
 
-Returns the **day of month** (1–31) from a **Date** value.
+**Definition**
+Returns the day of the month (1–31).
+
+**Examples**
 
 ```java
 DAY(DATE(2025, 12, 10))
-// Output (Number): 10
+// Output: 10
 ```
 
 ```java
 DAY(TODAY())
-// If TODAY() = 2025-12-10
-// Output (Number): 10
+// Output: today’s day of month
 ```
 
 ```java
 DAY(DATEVALUE(CloseDate))
-// If CloseDate = 2025-03-05 14:00
-// DATEVALUE(CloseDate) = 2025-03-05
-// DAY(...) Output (Number): 5
+// Output: day part of CloseDate
 ```
+
+**Tips**
+
+- Combine with MONTH and YEAR for date analysis.
 
 ---
 
-### DAYOFYEAR(date)
+### 2.6 DAYOFYEAR(date)
 
-Returns the **day number of the year** (1–365 or 366 for leap year).
+**Definition**
+Returns the day number of the year (1–365 or 366 in leap year).
+
+**Examples**
 
 ```java
 DAYOFYEAR(DATE(2024, 1, 1))
-// Output (Number): 1
+// Output: 1
 ```
 
 ```java
 DAYOFYEAR(DATE(2024, 12, 31))
-// 2024 is leap year
-// Output (Number): 366
+// Output: 366
 ```
 
 ```java
 DAYOFYEAR(TODAY())
-// If TODAY() = 2025-03-01 (for example)
-// Output (Number): 60  (depends on actual date)
+// Output: current day-of-year number
 ```
 
 ---
 
-### FORMATDURATION(...)
+### 2.7 FORMATDURATION(start, end) or FORMATDURATION(seconds)
 
-`FORMATDURATION(numSeconds[, includeDays])` **or**
-`FORMATDURATION(datetimeOrTime1, datetimeOrTime2)`
+**Definition**
+Returns the duration between two Date/Time or Time values, or a number of seconds, as text in `DD:HH:MM:SS`.
 
-Returns the **difference** between two Date/Times (or Time values) or a number of seconds as **Text** in `DD:HH:MM:SS`.
+**Key Points**
+
+- Output is text, not a numeric time.
+- Can take two Date/Times or a numeric seconds value.
+
+**Examples**
 
 ```java
 FORMATDURATION(
-    DATETIMEVALUE("2024-01-01 10:00:00"),
-    DATETIMEVALUE("2024-01-02 11:30:00")
+  DATETIMEVALUE("2024-01-01 10:00:00"),
+  DATETIMEVALUE("2024-01-02 11:30:00")
 )
-// Difference = 1 day, 1 hour, 30 minutes
-// Output (Text): "01:01:30:00"
+// Output: "01:01:30:00"
 ```
 
 ```java
 FORMATDURATION(90)
-// 90 seconds = 1 minute 30 seconds
-// Output (Text): "00:00:01:30"
-```
-
-```java
-FORMATDURATION(
-    Start_Time__c,
-    End_Time__c
-)
-// If Start = 2025-01-01 09:00, End = 2025-01-01 17:15
-// Output (Text): "00:08:15:00"
+// Output: "00:00:01:30"
 ```
 
 ---
 
-### HOUR(time)
+### 2.8 HOUR(time_or_datetime)
 
-Returns the **hour** (1–24) from a **Time** or **Date/Time**.
+**Definition**
+Returns the hour (0–23) from a Time or Date/Time value.
+
+**Examples**
 
 ```java
 HOUR(TIMEVALUE("17:30:45.125"))
-// Output (Number): 17
-```
-
-```java
-HOUR(TIMEVALUE("00:05:00.000"))
-// Output (Number): 0 or 24 (implementation varies; conceptually midnight)
+// Output: 17
 ```
 
 ```java
 HOUR(ClosedDate)
 // If ClosedDate = 2025-12-10 06:45
-// Output (Number): 6   (local user time)
+// Output: 6
 ```
 
 ---
 
-### ISOYEAR(date)
+### 2.9 ISOYEAR(date)
 
-Returns the **ISO 8601 year** for a given Date (can differ from calendar year for dates in first/last week of year).
+**Definition**
+Returns the ISO 8601 year for a given date.
+
+**Examples**
 
 ```java
 ISOYEAR(DATE(2023, 6, 15))
-// Output (Number): 2023   (normal mid-year date)
+// Output: 2023
 ```
 
 ```java
 ISOYEAR(DATE(2021, 1, 1))
-// ISO week for 2021-01-01 belongs to ISO year 2020
-// Output (Number): 2020
-```
-
-```java
-ISOYEAR(TODAY())
-// Output (Number): ISO year of “today’s” date
+// May return 2020, depending on ISO week rules
 ```
 
 ---
 
-### ISOWEEK(date)
+### 2.10 ISOWEEK(date)
 
-Returns the **ISO 8601 week number** (1–53) for a Date.
+**Definition**
+Returns the ISO 8601 week number (1–53).
+
+**Examples**
 
 ```java
 ISOWEEK(DATE(2023, 6, 15))
-// Output (Number): 24   (ISO week 24 of 2023)
-```
-
-```java
-ISOWEEK(DATE(2021, 1, 1))
-// Output (Number): 53   (last ISO week of 2020)
+// Output: week number (for example, 24)
 ```
 
 ```java
 ISOWEEK(TODAY())
-// Output (Number): ISO week number of “today’s” date
+// Output: current ISO week number
 ```
 
 ---
 
-### MILLISECOND(time)
+### 2.11 MILLISECOND(time_or_datetime)
 
-Returns the **milliseconds** (0–999) from a Time or Date/Time.
+**Definition**
+Returns the millisecond part (0–999) of a Time or Date/Time.
+
+**Examples**
 
 ```java
 MILLISECOND(TIMEVALUE("10:15:30.987"))
-// Output (Number): 987
+// Output: 987
 ```
 
 ```java
 MILLISECOND(TIMENOW())
-// Output (Number): current millisecond part, e.g., 123
-```
-
-```java
-MILLISECOND(CreatedDate)
-// If CreatedDate has no ms part, usually
-// Output (Number): 0
+// Output: current milliseconds (implementation dependent)
 ```
 
 ---
 
-### MINUTE(time)
+### 2.12 MINUTE(time_or_datetime)
 
-Returns the **minute** part (0–59/60) from a Time or Date/Time.
+**Definition**
+Returns the minute part (0–59) of a Time or Date/Time.
+
+**Examples**
 
 ```java
 MINUTE(TIMEVALUE("17:30:45.125"))
-// Output (Number): 30
-```
-
-```java
-MINUTE(TIMENOW())
-// Output (Number): current minute, e.g., 42
+// Output: 30
 ```
 
 ```java
 MINUTE(CreatedDate)
-// If CreatedDate = 2025-12-10 09:05
-// Output (Number): 5
+// Output: minute of created time
 ```
 
 ---
 
-### MONTH(date) _(you wrote MONTHS, actual function name is `MONTH`)_
+### 2.13 MONTH(date)
 
-Returns the **month number** (1–12) from a Date.
+**Definition**
+Returns the month part (1–12) of a Date.
+
+**Examples**
 
 ```java
 MONTH(DATE(2025, 12, 10))
-// Output (Number): 12
+// Output: 12
 ```
 
 ```java
 MONTH(TODAY())
-// If TODAY() = 2025-03-10
-// Output (Number): 3
-```
-
-```java
-MONTH(DATEVALUE(CloseDate))
-// CloseDate: 2025-07-01 10:00
-// DATEVALUE(...) = 2025-07-01
-// Output (Number): 7
+// Output: current month number
 ```
 
 ---
 
-### NOW()
+### 2.14 NOW()
 
-Returns the **current Date/Time** (moment) as a **Date/Time** value.
+**Definition**
+Returns the current date and time as a Date/Time, in the user’s time zone.
 
-> Calculated using the **user’s timezone**.
+**Examples**
 
 ```java
 NOW()
-// Output (Date/Time): current date & time
-// e.g., 2025-12-10 05:15 PM (user’s local time)
+// Output: current date/time
 ```
 
 ```java
 NOW() + 3
-// Adds 3 days
-// Output (Date/Time): 3 days from now, same time
+// Output: date/time 3 days from now
 ```
 
 ```java
 NOW() - CreatedDate
-// Output (Number): days between CreatedDate and now
+// Output: number of days between created and now
 ```
 
 ---
 
-### SECOND(time)
+### 2.15 SECOND(time_or_datetime)
 
-Returns the **seconds** part (0–59) from a Time or Date/Time.
+**Definition**
+Returns the seconds part (0–59) of a Time or Date/Time.
+
+**Examples**
 
 ```java
 SECOND(TIMEVALUE("17:30:45.125"))
-// Output (Number): 45
+// Output: 45
 ```
 
 ```java
 SECOND(TIMENOW())
-// Output (Number): current seconds, e.g., 12
-```
-
-```java
-SECOND(ClosedDate)
-// If ClosedDate = 2025-12-10 09:00:30
-// Output (Number): 30
+// Output: current seconds
 ```
 
 ---
 
-### TIMENOW()
+### 2.16 TIMENOW()
 
-Returns the **current time** (without date) as a **Time** value, in **GMT**, then shown in user’s timezone.
+**Definition**
+Returns the current time (no date) as a Time value.
+
+**Examples**
 
 ```java
 TIMENOW()
-// Output (Time): current time
-// e.g., 14:05:23.250
+// Output: current time
 ```
 
 ```java
 HOUR(TIMENOW())
-// Output (Number): current hour (0–23/24)
-```
-
-```java
-TIMENOW() - TIMEVALUE("09:00:00.000")
-// Output (Number): fraction of a day between now and 9 AM
-// To convert to hours: (TIMENOW() - TIMEVALUE("09:00:00.000")) * 24
+// Output: current hour
 ```
 
 ---
 
-### TIMEVALUE(expression)
+### 2.17 TIMEVALUE(expression)
 
-Converts a **Date/Time or text** expression into a **Time** value (`HH:MM:SS.MS`).
+**Definition**
+Converts a Date/Time or text expression into a Time value.
+
+**Examples**
 
 ```java
 TIMEVALUE("17:30:45.125")
-// Output (Time): 17:30:45.125
+// Output: 17:30:45.125
 ```
 
 ```java
 TIMEVALUE(ClosedDate)
-// If ClosedDate = 2025-12-10 09:15:00
-// Output (Time): 09:15:00.000
-```
-
-```java
-TIMEVALUE("06:00:00.000") + (2/24)
-// Adds 2 hours
-// Output (Time): 08:00:00.000
+// Output: time part of ClosedDate
 ```
 
 ---
 
-### TODAY()
+### 2.18 TODAY()
 
-Returns **today’s date** (no time) as a **Date**.
+**Definition**
+Returns today’s date (no time) as a Date.
+
+**Examples**
 
 ```java
 TODAY()
-// Output (Date): current date
-// e.g., 2025-12-10
-```
-
-```java
-TODAY() - CreatedDate
-// CreatedDate is Date (not Date/Time)
-// Output (Number): days between CreatedDate and today
+// Output: today's date
 ```
 
 ```java
 TODAY() + 7
-// Output (Date): date 7 days in the future
+// Output: date 7 days from today
+```
+
+```java
+TODAY() - CreatedDate
+// Output: number of days difference
 ```
 
 ---
 
-### UNIXTIMESTAMP(expression)
+### 2.19 UNIXTIMESTAMP(expression)
 
-`UNIXTIMESTAMP(dateTimeOrTime)`
+**Definition**
+Returns the number of seconds since 1970-01-01 00:00:00 UTC.
 
-Returns the number of **seconds since 1970-01-01 00:00:00 UTC** (“Unix epoch”).
+**Examples**
 
 ```java
 UNIXTIMESTAMP(DATETIMEVALUE("1970-01-01 00:00:00"))
-// Output (Number): 0
+// Output: 0
 ```
 
 ```java
-UNIXTIMESTAMP(DATETIMEVALUE("1970-01-01 00:01:40"))
-// 100 seconds after epoch
-// Output (Number): 100
-```
-
-```java
-UNIXTIMESTAMP(TIMEVALUE("01:30:00.000"))
-// Seconds from start of day = 1 * 3600 + 30 * 60 = 5400
-// Output (Number): 5400
+UNIXTIMESTAMP(TIMENOW())
+// Output: seconds-from-midnight today
 ```
 
 ---
 
-### WEEKDAY(date)
+### 2.20 WEEKDAY(date)
 
-Returns **day of week** as a number:
-**1 = Sunday, 2 = Monday, …, 7 = Saturday**
+**Definition**
+Returns a number representing the day of week:
+1 = Sunday, 2 = Monday, ..., 7 = Saturday.
+
+**Examples**
 
 ```java
-WEEKDAY(DATE(2025, 12, 07))
-// 7 Dec 2025 is Sunday
-// Output (Number): 1
+WEEKDAY(DATE(2025, 12, 7))
+// Output: 1 (Sunday)
 ```
 
 ```java
 WEEKDAY(TODAY())
-// Output (Number): depends on today’s weekday
-// e.g., 4 for Wednesday
-```
-
-```java
-WEEKDAY(DATEVALUE(CloseDate))
-// If CloseDate is 2025-03-14 10:00 (Friday)
-// Output (Number): 6
+// Output: current weekday number
 ```
 
 ---
 
-### YEAR(date)
+### 2.21 YEAR(date)
 
-Returns the **year** from a Date.
+**Definition**
+Returns the year part of a Date.
+
+**Examples**
 
 ```java
 YEAR(DATE(2025, 12, 10))
-// Output (Number): 2025
+// Output: 2025
 ```
 
 ```java
 YEAR(TODAY())
-// Output (Number): current year
-```
-
-```java
-YEAR(DATEVALUE(CloseDate))
-// If CloseDate = 2023-09-01 11:00
-// DATEVALUE(...) = 2023-09-01
-// Output (Number): 2023
+// Output: current year
 ```
 
 ---
 
-## **Logical Functions**
+## 3. Logical and Conditional Functions
 
-### AND(logical1, logical2, ...)
+---
 
-Returns TRUE if **all** conditions are TRUE.
+### 3.1 AND(logical1, logical2, ...)
 
-### Key Points
+**Definition**
+Returns TRUE if all conditions are TRUE; otherwise FALSE.
 
-- Every argument must be a Boolean expression.
-- If any condition is FALSE, the result is FALSE.
-- Commonly used in validation rules.
+**Key Points**
 
-### Examples
+- All arguments must be Boolean expressions.
 
-```
+**Examples**
+
+```java
 AND(TRUE, TRUE)
-Output: TRUE
+// Output: TRUE
 ```
 
-```
+```java
 AND(Amount > 1000, StageName = "Closed Won")
-Output: TRUE (if both conditions are met)
+// Output: TRUE or FALSE
 ```
 
-```
+```java
 AND(NOT(ISBLANK(Phone)), ISNUMBER(SUBSTITUTE(Phone, "-", "")))
-Output: TRUE (if phone is filled and numeric)
+// Output: TRUE if phone is filled and numeric
 ```
 
-### Tips
+**Tips**
 
-- Use when all conditions must be satisfied.
-- You can also use the && operator in most places.
+- Use when all conditions must be met (e.g., complex validation rules).
 
-### Limitations
+**Limitations**
 
-- No short-circuiting: all arguments are evaluated.
-- Passing a non-Boolean value causes a type error.
+- No short-circuit behavior; all arguments are evaluated.
 
 ---
 
-## BLANKVALUE(expression, substitute_expression)
+### 3.2 BLANKVALUE(expression, substitute_expression)
 
-If expression is blank, returns the substitute. Otherwise returns expression.
+**Definition**
+Returns `expression` if it is not blank; otherwise returns `substitute_expression`.
 
-### Key Points
+**Key Points**
 
-- Best used to provide default values.
-- Works with text, date, number fields.
+- Good for providing default values.
+- Works for text, numbers, dates.
 
-### Examples
+**Examples**
 
-```
+```java
 BLANKVALUE(Account.Name, "No Name")
-Output: "Acme" or "No Name"
+// Output: existing name or "No Name"
 ```
 
-```
-BLANKVALUE(Due_Date__c, CreatedDate + 7)
-Output: Due_Date__c or default 7 days after created
+```java
+BLANKVALUE(Payment_Due_Date__c, StartDate__c + 5)
+// Output: due date or StartDate + 5
 ```
 
-```
+```java
 BLANKVALUE(SLA_Hours__c, 0)
-Output: 0 if field is blank
+// Output: field value or 0
 ```
 
-### Tips
+**Tips**
 
-- Ideal for replacing blanks that cause calculation issues.
+- Use to avoid null/blank issues in numeric formulas.
 
-### Limitations
+**Limitations**
 
-- A space (" ") is not considered blank.
-- For numbers, behavior may change based on “Treat blank fields as zero” formula setting.
+- A space " " is not considered blank.
+- For numeric fields, behavior is affected by the “Treat blank fields as zero” setting.
 
 ---
 
-## CASE(expression, value1, result1, ..., else_result)
+### 3.3 CASE(expression, value1, result1, ..., else_result)
 
-Compares an expression to several values and returns the matching result.
+**Definition**
+Compares `expression` to multiple values and returns the matching result; otherwise returns `else_result`.
 
-### Key Points
+**Key Points**
 
-- Useful for replacing complex nested IFs.
-- All results must be of the same data type.
+- All results must be same data type.
+- Replaces complex nested IFs.
 
-### Examples
-
-```
-CASE(Term__c, "12", 12*Fee__c, "24", 24*Fee__c, 0)
-Output: Term-based calculation
-```
-
-```
-CASE(Priority__c, "High", "4 Hours", "Medium", "1 Day", "3 Days")
-Output: Text result
-```
-
-```
-CASE(TEXT(Region__c), "North", "John", "South", "Jane", "Unassigned")
-Output: Assign based on region
-```
-
-### Tips
-
-- Best suited for picklist branching.
-- Use TEXT() when working with picklists.
-
-### Limitations
-
-- Missing else_result causes an error if no match is found.
-- Invalid values in any branch can cause the whole CASE to fail.
-
----
-
-## IF(logical_test, value_if_true, value_if_false)
-
-Returns value_if_true when condition is true; otherwise value_if_false.
-
-### Key Points
-
-- Fundamental for conditional logic.
-- Both return values must have compatible data types.
-
-### Examples
-
-```
-IF(Amount > 100000, "High", "Normal")
-Output: "High" or "Normal"
-```
-
-```
-IF(CloseDate < TODAY(), "Overdue", "On Track")
-Output: Text value
-```
-
-```
-IF(ISPICKVAL(StageName, "Closed Won"), Amount * 0.05, 0)
-Output: Commission amount
-```
-
-### Tips
-
-- Use CASE() when checking the same field for multiple possible values.
-
-### Limitations
-
-- Too many nested IFs become unreadable.
-- logical_test must return a Boolean value.
-
----
-
-## ISNULL(expression)
-
-Returns TRUE if expression is null; otherwise FALSE.
-
-### Key Points
-
-- Supported mainly for backward compatibility.
-- Recommended to use ISBLANK() instead.
-
-### Examples
-
-```
-ISNULL(Discount__c)
-Output: TRUE if the number field is blank
-```
-
-```
-ISNULL(CloseDate)
-Output: TRUE if date field is blank
-```
-
-```
-ISNULL(Text_Field__c)
-Output: FALSE (text fields are never null)
-```
-
-### Tips
-
-- Prefer ISBLANK for new formulas.
-
-### Limitations
-
-- Text fields always return FALSE, even when empty.
-- Behavior is inconsistent across field types.
-
----
-
-## ISCLONE()
-
-Returns TRUE if a record is being created through the "Clone" action.
-
-### Key Points
-
-- Useful when preventing copying sensitive fields on cloned records.
-- Commonly used in validation rules and flows.
-
-### Examples
-
-```
-ISCLONE()
-Output: TRUE if record is being cloned
-```
-
-```
-AND(ISCLONE(), ISPICKVAL(Status__c, "Closed"))
-Output: TRUE if a cloned record is being closed
-```
-
-```
-AND(ISCLONE(), NOT(ISBLANK(Approval__c)))
-Output: TRUE when a clone contains old approval data
-```
-
-### Tips
-
-- Use to restrict or adjust behavior for cloned records.
-
-### Limitations
-
-- Works only in rules/flows, not formula fields.
-
----
-
-## ISNEW()
-
-Returns TRUE when the formula runs during record creation.
-
-### Key Points
-
-- Works only in validation rules, workflow, and flows.
-
-### Examples
-
-```
-ISNEW()
-Output: TRUE when creating a new record
-```
-
-```
-AND(ISNEW(), ISBLANK(Source__c))
-Output: TRUE when Source__c is required on create
-```
-
-### Tips
-
-- Good for fields required only on creation, not update.
-
-### Limitations
-
-- Cannot be used in formula fields.
-- Behavior may vary during integration-upsert scenarios.
-
----
-
-## ISNUMBER(expression)
-
-Returns TRUE if the text expression is a valid number.
-
-### Key Points
-
-- Works on text values only.
-- Helps validate numeric input in text fields.
-
-### Examples
-
-```
-ISNUMBER("123")
-Output: TRUE
-```
-
-```
-ISNUMBER("12A3")
-Output: FALSE
-```
-
-```
-ISNUMBER(Phone__c)
-Output: TRUE if Phone__c contains only digits
-```
-
-### Tips
-
-- Use SUBSTITUTE to remove symbols before checking numeric validity.
-
-### Limitations
-
-- Cannot test number fields (they are always valid numbers).
-- Symbols, commas, currency signs cause FALSE unless cleaned.
-
----
-
-## NOT(logical)
-
-Returns the opposite Boolean value.
-
-### Examples
-
-```
-NOT(TRUE)
-Output: FALSE
-```
-
-```
-NOT(Amount > 1000)
-Output: TRUE if amount <= 1000
-```
-
-```
-AND(NOT(ISBLANK(Code__c)), NOT(ISNUMBER(Code__c)))
-Output: TRUE if Code__c has text but not numeric
-```
-
-### Tips
-
-- Often used to invert results of ISBLANK, ISNUMBER, AND, OR.
-
-### Limitations
-
-- Argument must be a Boolean expression.
-
----
-
-## NUMVALUE (Note: Salesforce Equivalent Is VALUE())
-
-Salesforce does not have NUMVALUE(). Use VALUE(text) instead.
-
-### Key Points
-
-- Converts text to a number.
-- Useful when importing numeric data stored as text.
-
-### Examples
-
-```
-VALUE("123")
-Output: 123
-```
-
-```
-VALUE("12.5") * 2
-Output: 25
-```
-
-```
-VALUE(Score_Text__c)
-Output: numeric value of the text
-```
-
-### Tips
-
-- Use after MID, LEFT, RIGHT when extracting numeric substrings.
-
-### Limitations
-
-- Returns an error if the text is not a valid number.
-
----
-
-## OR(logical1, logical2, ...)
-
-Returns TRUE if any condition is TRUE.
-
-### Key Points
-
-- Opposite of AND().
-
-### Examples
-
-```
-OR(TRUE, FALSE)
-Output: TRUE
-```
-
-```
-OR(ISBLANK(Email), ISBLANK(Phone))
-Output: TRUE if either is blank
-```
-
-```
-OR(ISPICKVAL(StageName, "Prospecting"), ISPICKVAL(StageName, "Qualification"))
-Output: TRUE for early pipeline stages
-```
-
-### Tips
-
-- Use OR to trigger validation when any bad condition happens.
-
-### Limitations
-
-- All arguments must be Boolean.
-
----
-
-## PRIORVALUE(field)
-
-Returns the value a field had **before** the current change.
-
-### Key Points
-
-- Used only in rules, workflows, flows.
-- Does not work in formula fields.
-
-### Examples
-
-```
-PRIORVALUE(Status__c)
-Output: previous status
-```
-
-```
-AND(ISPICKVAL(Status__c, "Closed"), PRIORVALUE(Status__c) <> "Closed")
-Output: TRUE when closing for the first time
-```
-
-```
-Amount > PRIORVALUE(Amount)
-Output: TRUE if amount increased
-```
-
-### Tips
-
-- Best for tracking change in fields like Status, Amount, Owner.
-
-### Limitations
-
-- Not available for all field types.
-- On insert, PRIORVALUE equals the current value.
-- Clearing a field can sometimes return unexpected previous values based on context.
-
----
-
-If you want, I can combine this and the Date/Time sheet into a **clean formatted PDF** or **Markdown cheat sheet**.
-
-## **Text Function**
-
-### BLANKVALUE(fieldValue, substitute_expression)
-
-Returns the field value if it contains a value; otherwise returns the substitute expression.
-
-```java
-BLANKVALUE(Department, "Undesignated")
-```
-
-```java
-BLANKVALUE(Payment_Due_Date__c, StartDate + 5)
-```
-
-**Notes:**
-
-- Use BLANKVALUE instead of NULLVALUE for new formulas.
-- A field containing a space character is **not** considered empty.
-- Use BLANKVALUE to output a substitute string; use ISBLANK to only check emptiness.
-- For numeric fields, the substitute expression is returned only when the field is empty and not treated as zero.
-
----
-
-### **BR()**
-
-Inserts a line break in formula text fields such as custom buttons, email templates, and text formulas.
-
----
-
-### **CASE(expression, value1, result1, value2, result2, ..., else_result)**
-
-Compares an expression to a series of values and returns the corresponding result.
-If no value matches, returns the `else_result`.
-
-**Notes:**
-
-- All value expressions must be of the same data type.
-- All result expressions must be of the same data type.
-- Cannot contain functions that return TRUE or FALSE. Convert Boolean to numeric if needed.
-- The `else_result` is mandatory.
-- If the field value is blank, the `else_result` is returned.
-- If any CASE expression returns an error, the entire formula errors.
-
-**Examples:**
+**Examples**
 
 ```java
 CASE(Days_Open__c,
   3, "Reassign",
   2, "Assign Task",
-  "Maintain")
+  "Maintain"
+)
 ```
 
 ```java
@@ -1073,1150 +686,947 @@ CASE(MONTH(LastActivityDate),
   10, "October",
   11, "November",
   12, "December",
-  "None")
+  "None"
+)
 ```
 
 ```java
 CASE($User.Country,
   "Japan", "Japanese",
   "US", "English",
-  "unknown")
+  "unknown"
+)
+```
+
+**Tips**
+
+- Use TEXT() for picklists: `CASE(TEXT(StageName), ...)`.
+
+**Limitations**
+
+- Missing else_result or invalid branches cause formula errors.
+
+---
+
+### 3.4 IF(logical_test, value_if_true, value_if_false)
+
+**Definition**
+Returns one value if condition is TRUE, another if FALSE.
+
+**Key Points**
+
+- Both return values must be compatible types.
+
+**Examples**
+
+```java
+IF(Amount > 100000, "High", "Normal")
+```
+
+```java
+IF(CloseDate < TODAY(), "Overdue", "On Track")
+```
+
+```java
+IF(ISPICKVAL(StageName, "Closed Won"), Amount * 0.05, 0)
+```
+
+**Tips**
+
+- Use CASE for many branches based on the same field.
+
+---
+
+### 3.5 ISNULL(expression)
+
+**Definition**
+Returns TRUE if expression is null; otherwise FALSE.
+(Primarily for backward compatibility.)
+
+**Key Points**
+
+- Behavior differs by field type; text fields are never null.
+
+**Examples**
+
+```java
+ISNULL(Discount__c)
+// TRUE if number field is blank
+```
+
+```java
+ISNULL(CloseDate)
+// TRUE if CloseDate is blank
+```
+
+```java
+ISNULL(Text_Field__c)
+// Usually FALSE, even if appears blank
+```
+
+**Tips**
+
+- Prefer ISBLANK in new formulas.
+
+---
+
+### 3.6 ISCLONE()
+
+**Definition**
+Returns TRUE if the current record was created via the Clone action.
+
+**Key Points**
+
+- Intended for validation rules, flows, and automation.
+
+**Examples**
+
+```java
+ISCLONE()
+// TRUE on cloned records
+```
+
+```java
+AND(ISCLONE(), ISPICKVAL(Status__c, "Closed"))
+// Block closing cloned records
 ```
 
 ---
 
-### CASESAFEID(id)
+### 3.7 ISNEW()
 
+**Definition**
+Returns TRUE when the formula is evaluated during record creation (before first save).
+
+**Key Points**
+
+- Used in validation rules, workflow, and flows.
+
+**Examples**
+
+```java
+ISNEW()
+```
+
+```java
+AND(ISNEW(), ISBLANK(Source__c))
+// Require Source__c on create only
+```
+
+---
+
+### 3.8 ISNUMBER(text_expression)
+
+**Definition**
+Returns TRUE if the text is a valid number; otherwise FALSE.
+
+**Examples**
+
+```java
+ISNUMBER("123")
+// TRUE
+```
+
+```java
+ISNUMBER("12A3")
+// FALSE
+```
+
+```java
+ISNUMBER(SUBSTITUTE(Phone__c, "-", ""))
+// TRUE if phone digits only after removing dashes
+```
+
+**Tips**
+
+- Use SUBSTITUTE to remove spaces, dashes, or symbols first.
+
+---
+
+### 3.9 NOT(logical)
+
+**Definition**
+Returns TRUE if argument is FALSE; returns FALSE if argument is TRUE.
+
+**Examples**
+
+```java
+NOT(TRUE)
+// FALSE
+```
+
+```java
+NOT(Amount > 1000)
+// TRUE if Amount <= 1000
+```
+
+```java
+AND(NOT(ISBLANK(Code__c)), NOT(ISNUMBER(Code__c)))
+// TRUE if Code__c filled but not numeric
+```
+
+---
+
+### 3.10 OR(logical1, logical2, ...)
+
+**Definition**
+Returns TRUE if any argument is TRUE; FALSE only if all are FALSE.
+
+**Examples**
+
+```java
+OR(TRUE, FALSE)
+// TRUE
+```
+
+```java
+OR(ISBLANK(Email), ISBLANK(Phone))
+// TRUE if either is blank
+```
+
+```java
+OR(
+  ISPICKVAL(StageName, "Prospecting"),
+  ISPICKVAL(StageName, "Qualification")
+)
+```
+
+---
+
+### 3.11 PRIORVALUE(field)
+
+**Definition**
+Returns the previous value of a field before the current change.
+
+**Key Points**
+
+- Works in validation rules, workflow, Process Builder, and flows.
+- On insert, PRIORVALUE equals the initial value.
+
+**Examples**
+
+```java
+PRIORVALUE(Status__c)
+// Previous status
+```
+
+```java
+AND(
+  ISPICKVAL(Status__c, "Closed"),
+  PRIORVALUE(Status__c) <> "Closed"
+)
+// TRUE when closing for the first time
+```
+
+```java
+Amount > PRIORVALUE(Amount)
+// TRUE if Amount increased
+```
+
+---
+
+### 3.12 ISCHANGED(field)
+
+**Definition**
+Returns TRUE if the field value changed in the current transaction.
+
+**Key Points**
+
+- Works in validation rules, workflow, Process Builder, and flows.
+- Not usable in formula fields.
+
+**Examples**
+
+```java
+ISCHANGED(Status__c)
+```
+
+```java
+AND(ISCHANGED(Amount), Amount > PRIORVALUE(Amount))
+// TRUE when Amount increased
+```
+
+---
+
+### 3.13 REGEX(text, pattern)
+
+**Definition**
+Returns TRUE if text matches the regex pattern; otherwise FALSE.
+
+**Examples**
+
+```java
+REGEX(Phone, "[0-9]{10}")
+// TRUE if Phone has exactly 10 digits
+```
+
+```java
+REGEX(Email,
+"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+```
+
+**Tips**
+
+- Use for strict input validation (phone, postal code, IDs, etc.).
+
+---
+
+### 3.14 PREDICT(predictionField, modelName)
+
+**Definition**
+Returns a prediction from an Einstein Prediction Builder model.
+
+**Examples**
+
+```java
+PREDICT(Churn_Score__c, "ChurnModel")
+```
+
+```java
+IF(PREDICT(Score__c, "LeadScore") > 0.8, "High", "Low")
+```
+
+**Limitations**
+
+- Requires Einstein Predictions to be configured.
+
+---
+
+## 4. Text and String Functions
+
+---
+
+### 4.1 BLANKVALUE(fieldValue, substitute_expression)
+
+(Already covered under Logical; commonly used for text as well.)
+
+---
+
+### 4.2 BR()
+
+**Definition**
+Inserts a line break in text formulas (buttons, email templates, text fields).
+
+**Example**
+
+```java
+"Line 1" & BR() & "Line 2"
+```
+
+---
+
+### 4.3 CASESAFEID(id)
+
+**Definition**
 Converts a 15-character case-sensitive ID to an 18-character case-insensitive ID.
 
-**Notes:**
-
-- Useful when exporting to Excel.
-- Available in most formula contexts except reports and s-controls.
-- In Lightning Experience, any 15-character input is converted.
-  Contact Salesforce Support if you need classic-style validation.
-
-**Examples:**
+**Examples**
 
 ```java
 CASESAFEID(Id)
+// Returns 18-character ID
 ```
 
 ```java
-CASESAFEID("A01xx000003DHur") → returns the same value (invalid ID)
-CASESAFEID("001xx000003DHur") → returns 18–character version
+CASESAFEID("001xx000003DHur")
+// Returns 18-char version if valid
 ```
 
 ---
 
-### BEGINS(text, compare_text)
+### 4.4 BEGINS(text, compare_text)
 
-Checks whether a text value starts with specified characters.
+**Definition**
+Returns TRUE if text starts with compare_text.
+
+**Examples**
 
 ```java
-IF(BEGINS(ProductType__c, "ICU"), "Medical", "Tech")
+BEGINS(ProductType__c, "ICU")
+// TRUE if ProductType__c starts with "ICU"
 ```
 
-**Notes:**
-
-- This function is case-sensitive.
-- In validation rules and workflow rules, blank fields are considered valid.
+```java
+BEGINS(Name, "Test")
+// TRUE if Name begins with "Test"
+```
 
 ---
 
-Below is a **clean, official-style, simple-format reference** for ALL the functions you listed.
-No emojis, no links, no citations — only pure text, examples, outputs, tips, and limitations.
+### 4.5 CONTAINS(text, compare_text)
 
----
+**Definition**
+Returns TRUE if compare_text appears anywhere in text.
 
-# CONTAINS(text, compare_text)
+**Examples**
 
-## Definition
-
-Returns TRUE if `compare_text` appears anywhere inside `text`.
-
-## Key Points
-
-- Case-sensitive.
-- Both arguments must be text or convertible to text.
-
-## Examples
-
-```
+```java
 CONTAINS("Salesforce Admin", "Admin")
-Output: TRUE
+// TRUE
 ```
 
-```
-CONTAINS("ABC123", "123")
-Output: TRUE
-```
-
-```
+```java
 CONTAINS("Hello", "hello")
-Output: FALSE (case-sensitive)
+// FALSE (case sensitive)
 ```
-
-## Tips
-
-- Wrap picklists inside TEXT() before using CONTAINS.
-
-## Limitations
-
-- Cannot search inside multi-select picklists reliably; use INCLUDES() for that.
 
 ---
 
-# FIND(search_text, text [, start_num])
+### 4.6 FIND(search_text, text [, start_num])
 
-## Definition
+**Definition**
+Returns the position (1-based) of search_text within text.
 
-Returns the **position (number index)** of `search_text` within `text`.
+**Examples**
 
-## Key Points
-
-- Case-sensitive.
-- If `start_num` is provided, searching begins from that position.
-- Returns an error if not found.
-
-## Examples
-
-```
+```java
 FIND("A", "SALESFORCE")
-Output: 2
+// Output: 2
 ```
 
-```
+```java
 FIND("force", "salesforce")
-Output: 6
+// Output: 6
 ```
-
-```
-FIND("Z", "APPLE")
-Output: Error
-```
-
-## Tips
-
-- Use with LEFT(), RIGHT(), MID() to parse text.
-
-## Limitations
-
-- Cannot safely use without checking if the substring exists (use CONTAINS first).
 
 ---
 
-# GETSESSIONID()
+### 4.7 HTMLENCODE(text)
 
-## Definition
+**Definition**
+Encodes special characters into HTML-safe entities.
 
-Returns the **current user’s session ID** as text.
+**Examples**
 
-## Key Points
-
-- Works only in formula fields for buttons/links and Visualforce contexts.
-- Not allowed in many modern Lightning contexts.
-- Sensitive: treat carefully.
-
-## Examples
-
-```
-GETSESSIONID()
-Output: A Salesforce session ID string
-```
-
-## Tips
-
-- Mainly used for integrations with buttons passing session ID.
-
-## Limitations
-
-- Not available in Lightning components, flows, Apex formulas, or most modern UI.
-- Should not be used casually for security reasons.
-
----
-
-# HTMLENCODE(text)
-
-## Definition
-
-Converts special characters into HTML-safe encoded characters.
-
-## Key Points
-
-- Protects against HTML interpretation.
-- Converts characters like < > & into encoded versions.
-
-## Examples
-
-```
+```java
 HTMLENCODE("<b>Hello</b>")
-Output: "&lt;b&gt;Hello&lt;/b&gt;"
+// "&lt;b&gt;Hello&lt;/b&gt;"
 ```
 
-```
+```java
 HTMLENCODE("Tom & Jerry")
-Output: "Tom &amp; Jerry"
+// "Tom &amp; Jerry"
 ```
-
-## Tips
-
-- Useful in email templates and Visualforce formulas.
-
-## Limitations
-
-- Not used inside LWC or Apex formulas.
 
 ---
 
-# HYPERLINK(url, friendly_name [, target])
+### 4.8 HYPERLINK(url, friendly_name [, target])
 
-## Definition
+**Definition**
+Creates a clickable hyperlink.
 
-Creates a clickable link.
+**Examples**
 
-## Key Points
-
-- `target` controls where the link opens ("\_blank", "\_self").
-
-## Examples
-
-```
+```java
 HYPERLINK("/" & Id, Name)
-Output: Link to the record
+// Link to the record
 ```
 
-```
+```java
 HYPERLINK("https://google.com", "Google", "_blank")
-Output: Opens Google in new tab
+// Opens in new tab
 ```
-
-## Tips
-
-- Useful for formula fields that redirect to external pages.
-
-## Limitations
-
-- Not clickable in all list views (depends on configuration).
 
 ---
 
-# INCLUDES(multiselect_picklist, text)
+### 4.9 INCLUDES(multiselect_picklist, text)
 
-## Definition
+**Definition**
+Returns TRUE if the multi-select picklist includes the given value.
 
-Returns TRUE if the multi-select picklist contains the specified value.
+**Examples**
 
-## Key Points
-
-- Works only with multi-select picklists.
-
-## Examples
-
-```
+```java
 INCLUDES(Products__c, "Laptop")
-Output: TRUE
 ```
 
-```
+```java
 INCLUDES(Hobbies__c, "Reading")
-Output: TRUE
 ```
-
-```
-INCLUDES(Hobbies__c, "Swimming")
-Output: FALSE
-```
-
-## Tips
-
-- Best used in validation rules.
-
-## Limitations
-
-- Does not work on single picklist fields.
 
 ---
 
-# ISPICKVAL(picklist, text)
+### 4.10 ISPICKVAL(picklist, text)
 
-## Definition
+**Definition**
+Returns TRUE if picklist equals given text.
 
-Returns TRUE if the picklist value equals the given text.
+**Examples**
 
-## Key Points
-
-- Only for single-select picklists.
-
-## Examples
-
-```
+```java
 ISPICKVAL(Status__c, "Open")
-Output: TRUE
 ```
 
-```
+```java
 ISPICKVAL(StageName, "Closed Won")
-Output: TRUE or FALSE
 ```
-
-## Tips
-
-- Often used in validation rules and workflow conditions.
-
-## Limitations
-
-- For multi-select picklists, use INCLUDES instead.
 
 ---
 
-# LEFT(text, number)
+### 4.11 LEFT(text, number)
 
-## Definition
+**Definition**
+Returns leftmost number characters of text.
 
-Returns the leftmost characters of a text.
+**Examples**
 
-## Examples
-
-```
+```java
 LEFT("Salesforce", 5)
-Output: "Salesf"
+// "Sales"
 ```
 
-```
+```java
 LEFT("Hello", 1)
-Output: "H"
+// "H"
 ```
 
 ---
 
-# LEN(text)
+### 4.12 LEN(text)
 
-## Definition
+**Definition**
+Returns the number of characters in text.
 
-Returns the number of characters in a text string.
+**Examples**
 
-## Examples
-
-```
+```java
 LEN("Salesforce")
-Output: 10
+// 10
 ```
 
-```
+```java
 LEN("")
-Output: 0
+// 0
 ```
 
 ---
 
-# LPAD(text, padded_length, pad_string)
+### 4.13 LPAD(text, padded_length, pad_string)
 
-## Definition
+**Definition**
+Pads text on the left with pad_string until padded_length is reached.
 
-Pads a text string on the **left** to reach a required length.
+**Examples**
 
-## Examples
-
-```
+```java
 LPAD("25", 5, "0")
-Output: "00025"
+// "00025"
 ```
 
-```
+```java
 LPAD("A", 3, "*")
-Output: "**A"
+// "**A"
 ```
-
-## Tips
-
-- Useful for ID formatting or serial numbers.
 
 ---
 
-# RPAD(text, padded_length, pad_string)
+### 4.14 RPAD(text, padded_length, pad_string)
 
-## Definition
+**Definition**
+Pads text on the right.
 
-Pads a text string on the **right**.
+**Examples**
 
-## Examples
-
-```
+```java
 RPAD("25", 5, "0")
-Output: "25000"
+// "25000"
 ```
 
-```
+```java
 RPAD("AB", 5, "-")
-Output: "AB---"
+// "AB---"
 ```
 
 ---
 
-# RIGHT(text, number)
+### 4.15 RIGHT(text, number)
 
-## Definition
+**Definition**
+Returns rightmost number characters of text.
 
-Returns the rightmost characters of a text string.
+**Examples**
 
-## Examples
-
-```
+```java
 RIGHT("Salesforce", 4)
-Output: "orce"
+// "orce"
 ```
 
-```
+```java
 RIGHT("12345", 2)
-Output: "45"
+// "45"
 ```
 
 ---
 
-# TEXT(expression)
+### 4.16 TEXT(expression)
 
-## Definition
+**Definition**
+Converts a value (number, date, picklist, etc.) to text.
 
-Converts a value (number, date, picklist) into text.
+**Examples**
 
-## Examples
-
-```
+```java
 TEXT(StageName)
-Output: StageName as text
 ```
 
-```
+```java
 TEXT(123)
-Output: "123"
+// "123"
 ```
 
-```
+```java
 TEXT(TODAY())
-Output: "2025-12-10" (example format)
+// date as string
 ```
-
-## Tips
-
-- Required when comparing picklists using CONTAINS or CASE.
 
 ---
 
-# SUBSTITUTE(text, old_text, new_text)
+### 4.17 SUBSTITUTE(text, old_text, new_text)
 
-## Definition
-
+**Definition**
 Replaces all occurrences of old_text with new_text.
 
-## Examples
+**Examples**
 
-```
+```java
 SUBSTITUTE("a-b-c", "-", "")
-Output: "abc"
+// "abc"
 ```
 
-```
+```java
 SUBSTITUTE("2025/12/10", "/", "-")
-Output: "2025-12-10"
+// "2025-12-10"
 ```
-
-```
-SUBSTITUTE("aaa", "a", "b")
-Output: "bbb"
-```
-
-## Tips
-
-- Useful for cleaning phone numbers before ISNUMBER checks.
 
 ---
 
-# TRIM(text)
+### 4.18 TRIM(text)
 
-## Definition
+**Definition**
+Removes leading and trailing spaces.
 
-Removes leading and trailing spaces from text.
+**Examples**
 
-## Examples
-
-```
+```java
 TRIM("  Hello  ")
-Output: "Hello"
+// "Hello"
 ```
 
-```
+```java
 TRIM(" Salesforce ")
-Output: "Salesforce"
+// "Salesforce"
 ```
 
 ---
 
-# UPPER(text)
+### 4.19 UPPER(text)
 
-## Definition
+**Definition**
+Converts text to uppercase.
 
-Converts all letters to uppercase.
+**Examples**
 
-## Examples
-
-```
+```java
 UPPER("salesforce")
-Output: "SALESFORCE"
+// "SALESFORCE"
 ```
 
-```
+```java
 UPPER("Hello World")
-Output: "HELLO WORLD"
+// "HELLO WORLD"
 ```
 
 ---
 
-# LOWER(text)
+### 4.20 LOWER(text)
 
-## Definition
+**Definition**
+Converts text to lowercase.
 
-Converts all letters to lowercase.
+**Examples**
 
-## Examples
-
-```
+```java
 LOWER("SALESFORCE")
-Output: "salesforce"
+// "salesforce"
 ```
 
-```
+```java
 LOWER("Hello World")
-Output: "hello world"
+// "hello world"
 ```
 
 ---
 
-# VALUE(text)
+### 4.21 VALUE(text)
 
-## Definition
+**Definition**
+Converts a numeric text string into a Number.
 
-Converts a numeric text string into a number.
+**Examples**
 
-## Examples
-
-```
+```java
 VALUE("123")
-Output: 123
+// 123
 ```
 
-```
+```java
 VALUE("12.5")
-Output: 12.5
+// 12.5
 ```
 
-```
+```java
 VALUE(LEFT("1000A", 4))
-Output: 1000
+// 1000
 ```
-
-## Tips
-
-- Combine with LEFT, RIGHT, MID for numeric extraction.
-
-## Limitations
-
-- Errors if text cannot be converted into a number.
 
 ---
 
-## **Math Function**
-
-Below is a clean, official-style, simple-format explanation for each function you listed — **no emojis, no links, no extra styling**, just pure documentation with definition, key points, examples, tips, and limitations.
+## 5. Math, Numeric, and Geolocation Functions
 
 ---
 
-# CEILING(number)
+### 5.1 CEILING(number)
 
-## Definition
+**Definition**
+Returns the smallest integer greater than or equal to number (rounds up).
 
-**CEILING(number)**
-Returns the **smallest integer greater than or equal to** the given number.
+**Examples**
 
-## Key Points
-
-- Always rounds **up** to the next whole number.
-- Even if the decimal is very small (e.g., 3.0001), it still rounds up.
-- Works only with Number values.
-
-## Examples
-
-```
+```java
 CEILING(2.1)
-Output: 3
+// 3
 ```
 
-```
-CEILING(5.0)
-Output: 5
-```
-
-```
+```java
 CEILING(-2.3)
-Output: -2
+// -2
 ```
-
-## Tips
-
-- Useful when you need to round up hours, billing units, or quantity.
-
-## Limitations
-
-- Cannot accept text; use VALUE() for text-to-number conversion first.
-- Always rounds up, even if very close to the lower integer.
 
 ---
 
-# DISTANCE(geoLocation1, geoLocation2, unit)
+### 5.2 FLOOR(number)
 
-## Definition
+**Definition**
+Returns the largest integer less than or equal to number (rounds down).
 
-**DISTANCE(location1, location2, unit)**
-Returns the distance between two **geolocation points** in **miles** or **kilometers**.
+**Examples**
 
-## Key Points
-
-- Works only with **Geolocation fields** or GEOLOCATION() function.
-- `unit` must be `"mi"` (miles) or `"km"` (kilometers).
-- Commonly used in formulas to determine nearest locations.
-
-## Examples
-
-```
-DISTANCE(
-    GEOLOCATION(37.7749, -122.4194),
-    GEOLOCATION(34.0522, -118.2437),
-    "mi"
-)
-Output: Approx. 347
-```
-
-```
-DISTANCE(Location__c, GEOLOCATION(40.7128, -74.0060), "km")
-Output: Distance from record's location to New York
-```
-
-```
-DISTANCE(Location_A__c, Location_B__c, "km")
-Output: Numeric distance in kilometers
-```
-
-## Tips
-
-- Use with validation rules or reports to calculate proximity.
-- Good for delivery tracking, territory management, and service radius.
-
-## Limitations
-
-- Only works with values that are valid latitude/longitude pairs.
-- Returns an error if unit is anything other than "mi" or "km".
-
----
-
-# EXP(number)
-
-## Definition
-
-**EXP(number)**
-Returns _e_ raised to the power of the number.
-Where **e = 2.718281828...**
-
-## Key Points
-
-- Mathematical exponential function.
-- Often used in financial, scientific, or growth-related calculations.
-
-## Examples
-
-```
-EXP(1)
-Output: 2.718281828
-```
-
-```
-EXP(0)
-Output: 1
-```
-
-```
-EXP(2)
-Output: 7.389056099
-```
-
-## Tips
-
-- Combine with LN() for percentage growth calculations.
-
-## Limitations
-
-- Large numbers grow rapidly, causing overflow or large results.
-
----
-
-# FLOOR(number)
-
-## Definition
-
-**FLOOR(number)**
-Returns the **largest integer less than or equal to** the given number.
-
-## Key Points
-
-- Always rounds **down**.
-- Works with positive and negative numbers.
-
-## Examples
-
-```
+```java
 FLOOR(4.9)
-Output: 4
+// 4
 ```
 
-```
-FLOOR(7.0)
-Output: 7
-```
-
-```
+```java
 FLOOR(-2.3)
-Output: -3
+// -3
 ```
-
-## Tips
-
-- Useful for rounding down quantities, time slots, or page counts.
-
-## Limitations
-
-- Does not consider rounding rules; always rounds down.
 
 ---
 
-# GEOLOCATION(latitude, longitude)
+### 5.3 ROUND(number, num_digits)
 
-## Definition
+**Definition**
+Rounds number to num_digits decimal places.
 
-**GEOLOCATION(latitude, longitude)**
-Creates a geolocation value using latitude and longitude.
+**Examples**
 
-## Key Points
-
-- Latitude must be between -90 and 90.
-- Longitude must be between -180 and 180.
-- Returned value can only be used with Geolocation-supported functions like DISTANCE().
-
-## Examples
-
-```
-GEOLOCATION(37.7749, -122.4194)
-Output: Geolocation value for San Francisco
-```
-
-```
-GEOLOCATION(19.0760, 72.8777)
-Output: Geolocation value for Mumbai
-```
-
-```
-DISTANCE(GEOLOCATION(37, -121), GEOLOCATION(38, -122), "km")
-Output: Numeric distance
-```
-
-## Tips
-
-- Useful when storing coordinates manually inside formulas.
-
-## Limitations
-
-- Only usable with DISTANCE.
-- Invalid coordinates cause formula errors.
-
----
-
-# ROUND(number, num_digits)
-
-## Definition
-
-**ROUND(number, num_digits)**
-Rounds a number to a specified number of decimal places.
-
-## Key Points
-
-- Uses standard rounding rules (0–4 down, 5–9 up).
-- num_digits can be positive, zero, or negative.
-
-## Examples
-
-```
+```java
 ROUND(3.14159, 2)
-Output: 3.14
+// 3.14
 ```
 
-```
+```java
 ROUND(1234.56, -2)
-Output: 1200
+// 1200
 ```
-
-```
-ROUND(5.555, 2)
-Output: 5.56
-```
-
-## Tips
-
-- Use negative num_digits to round to nearest tens/hundreds.
-- Good for currency, tax, and percentage calculations.
-
-## Limitations
-
-- Rounding inconsistencies may occur with floating point precision.
 
 ---
 
-# PICKLISTCOUNT(picklistMultiSelectField)
+### 5.4 EXP(number)
 
-## Definition
+**Definition**
+Returns e raised to power number.
 
-**PICKLISTCOUNT(field)**
-Returns the number of selected values in a **multi-select picklist**.
+**Examples**
 
-## Key Points
-
-- Works only with **multi-select picklist** fields.
-- Returns an integer.
-
-## Examples
-
+```java
+EXP(1)
+// Approx 2.718281828
 ```
+
+```java
+EXP(0)
+// 1
+```
+
+---
+
+### 5.5 DISTANCE(geoLocation1, geoLocation2, unit)
+
+**Definition**
+Returns the distance between two geolocation values, in miles or kilometers.
+
+**Examples**
+
+```java
+DISTANCE(
+  GEOLOCATION(37.7749, -122.4194),
+  GEOLOCATION(34.0522, -118.2437),
+  "mi"
+)
+```
+
+```java
+DISTANCE(Location__c, GEOLOCATION(40.7128, -74.0060), "km")
+```
+
+---
+
+### 5.6 GEOLOCATION(latitude, longitude)
+
+**Definition**
+Creates a geolocation value.
+
+**Examples**
+
+```java
+GEOLOCATION(37.7749, -122.4194)
+```
+
+```java
+GEOLOCATION(19.0760, 72.8777)
+```
+
+---
+
+### 5.7 PICKLISTCOUNT(multiselect_picklist_field)
+
+**Definition**
+Returns the number of selected values in a multi-select picklist.
+
+**Examples**
+
+```java
 PICKLISTCOUNT(Products__c)
-// If "TV; Laptop; Mobile"
-// Output: 3
+// "TV; Laptop; Mobile" -> 3
 ```
 
-```
+```java
 PICKLISTCOUNT(Hobbies__c)
-// If only "Reading"
-// Output: 1
+// Blank -> 0
 ```
-
-```
-PICKLISTCOUNT(Hobbies__c)
-// If blank
-// Output: 0
-```
-
-## Tips
-
-- Useful to enforce maximum/minimum multi-select values in validation rules.
-
-## Limitations
-
-- Does not work on regular picklist fields.
-- Counting depends on semicolon-separated values internally.
 
 ---
 
-## **Advanced Functions**
+### 5.8 CURRENCYRATE(currencyIsoCode)
 
-Here is the **clean, simple, official-style documentation** for the remaining Salesforce functions you listed.
-No emojis, no links, no formatting tricks — just pure text with definition, key points, examples, tips, and limitations.
+**Definition**
+Returns the conversion rate between the specified currency and the corporate currency.
 
----
+**Examples**
 
-# PARENTGROUPVAL(summary_field, group_level)
-
-## Definition
-
-Returns the value of a summary field **from a parent group** in a report.
-
-## Key Points
-
-- Works only inside **report formulas** (not in fields, flows, or Apex).
-- Used in **matrix** and **summary** reports.
-- group_level indicates which parent grouping to reference.
-
-## Examples
-
-```
-PARENTGROUPVAL(SUM(Amount), GRAND_SUMMARY)
-Output: Sum of Amount at the grand total level
-```
-
-```
-PARENTGROUPVAL(SUM(Amount), REGION)
-Output: Sum of Amount for the Region group
-```
-
-## Tips
-
-- Useful for percentage-of-total calculations in reports.
-
-## Limitations
-
-- Only works in reporting context.
-- Cannot be used in formula fields on objects.
-
----
-
-# PREVGROUPVAL(summary_field, group_level [, increment])
-
-## Definition
-
-Returns a summary value from the **previous group** in a report.
-
-## Key Points
-
-- Only available in report formulas.
-- increment determines how many groups back to look.
-
-## Examples
-
-```
-PREVGROUPVAL(SUM(Amount), REGION)
-Output: Sum of Amount from the previous Region
-```
-
-```
-PREVGROUPVAL(SUM(Revenue__c), MONTH, 1)
-Output: Revenue from the previous month grouping
-```
-
-## Tips
-
-- Commonly used for period-to-period comparisons.
-
-## Limitations
-
-- Works only in reports.
-- Not available in formula fields on objects.
-
----
-
-# CURRENCYRATE(currencyIsoCode)
-
-## Definition
-
-Returns the **conversion rate** between a specified currency and the corporate currency.
-
-## Key Points
-
-- Works only in **multi-currency orgs**.
-- Argument must be a valid ISO currency code (e.g., "USD", "EUR").
-
-## Examples
-
-```
+```java
 CURRENCYRATE("USD")
-Output: numeric rate relative to corporate currency
 ```
 
+```java
+Amount__c * CURRENCYRATE("EUR")
 ```
-Amount * CURRENCYRATE("EUR")
-Output: Amount converted to EUR
-```
-
-```
-100 / CURRENCYRATE("INR")
-Output: Converts 100 corporate currency units to INR
-```
-
-## Tips
-
-- Use for displaying different currency values inside formulas.
-
-## Limitations
-
-- Not supported in some orgs without multi-currency enabled.
-- Cannot convert between two non-corporate currencies directly.
 
 ---
 
-# GETRECORDIDS()
+## 6. Reporting and Analytics Functions
 
-## Definition
+---
 
-Returns a list of record IDs currently selected in a **Lightning page list view** or Salesforce Console.
+### 6.1 PARENTGROUPVAL(summary_field, group_level)
 
-## Key Points
+**Definition**
+Returns a summary value from a parent group in a report.
 
-- Used in **custom buttons** or **actions**.
-- Returns a text collection.
+**Examples**
 
-## Examples
-
+```java
+PARENTGROUPVAL(SUM(Amount), GRAND_SUMMARY)
 ```
+
+```java
+PARENTGROUPVAL(SUM(Amount), REGION)
+```
+
+---
+
+### 6.2 PREVGROUPVAL(summary_field, group_level [, increment])
+
+**Definition**
+Returns a summary value from a previous group in a report.
+
+**Examples**
+
+```java
+PREVGROUPVAL(SUM(Amount), REGION)
+// Previous region’s total
+```
+
+```java
+PREVGROUPVAL(SUM(Revenue__c), MONTH, 1)
+// Previous month’s revenue
+```
+
+---
+
+## 7. Advanced Platform Functions
+
+---
+
+### 7.1 GETSESSIONID()
+
+**Definition**
+Returns the current user’s session ID as text.
+
+**Examples**
+
+```java
+GETSESSIONID()
+```
+
+**Notes**
+
+- Mainly for legacy Visualforce or URL button integrations.
+
+---
+
+### 7.2 GETRECORDIDS()
+
+**Definition**
+Returns the IDs of selected records in a Lightning list view or console.
+
+**Examples**
+
+```java
 GETRECORDIDS()
-Output: A comma-separated list of selected record IDs
 ```
 
+```java
+"Selected: " & GETRECORDIDS()
 ```
-"Selected IDs: " & GETRECORDIDS()
-Output: Text showing selected IDs
-```
-
-## Tips
-
-- Often used to pass selected records into a Flow.
-
-## Limitations
-
-- Only works in Lightning list views or console views.
-- Cannot be used in formula fields.
 
 ---
 
-# INCLUDE()
+### 7.3 INCLUDE(article_reference)
 
-## Definition
+**Definition**
+Used in Salesforce Knowledge to include the content of one article inside another.
 
-Used in **Salesforce Knowledge** to include the content of one article inside another.
+**Examples**
 
-## Key Points
-
-- Works only in Knowledge Article rich text formula fields.
-- Helps maintain reusable text blocks.
-
-## Examples
-
-```
-INCLUDE("Article_ID")
-Output: Inserts the content of that article
-```
-
-```
+```java
 INCLUDE("Troubleshooting_Steps")
-Output: The referenced article's text
 ```
-
-## Tips
-
-- Ideal for shared disclaimers, legal text, or repeated instructions.
-
-## Limitations
-
-- Cannot be used outside Knowledge.
-- Fails if the referenced article is archived or deleted.
 
 ---
 
-# ISCHANGED(field)
+If you want, I can now:
 
-## Definition
-
-Returns TRUE if the field value has changed in the current transaction.
-
-## Key Points
-
-- Works in **validation rules**, **workflow**, **flows**, **Process Builder**, and **record-triggered automation**.
-- Does not work in formula fields.
-
-## Examples
-
-```
-ISCHANGED(Status__c)
-Output: TRUE if Status changed
-```
-
-```
-AND(ISCHANGED(Amount), Amount > PRIORVALUE(Amount))
-Output: TRUE if Amount increased
-```
-
-```
-ISCHANGED(OwnerId)
-Output: TRUE when owner changes
-```
-
-## Tips
-
-- Use PRIOVALUE(field) to compare old vs new values.
-
-## Limitations
-
-- Always FALSE on initial record creation.
-- Not available in formula fields.
-
----
-
-# PREDICT(predictionField, modelName)
-
-## Definition
-
-Returns the prediction value from an **Einstein Prediction Builder** model.
-
-## Key Points
-
-- Works only if prediction fields and model are deployed.
-- modelName is the API name of the prediction model.
-
-## Examples
-
-```
-PREDICT(Churn_Score__c, "ChurnModel")
-Output: The predicted churn score
-```
-
-```
-PREDICT(Risk__c, "LoanRiskModel")
-Output: The evaluated risk value
-```
-
-```
-IF(PREDICT(Score__c, "LeadScoreModel") > 0.8, "High", "Low")
-Output: Classification based on score
-```
-
-## Tips
-
-- Useful for real-time decision making inside formulas.
-
-## Limitations
-
-- Requires Einstein predictions to be enabled.
-- Model must support formula access.
-
----
-
-# REGEX(text, regexPattern)
-
-## Definition
-
-Returns TRUE if text matches the regular expression pattern.
-
-## Key Points
-
-- Powerful for data validation.
-- Pattern must be valid Salesforce-compatible regex.
-
-## Examples
-
-```
-REGEX(Phone, "[0-9]{10}")
-Output: TRUE if phone has 10 digits
-```
-
-```
-REGEX(Email, "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
-Output: TRUE if email is valid
-```
-
-```
-REGEX(Postal_Code__c, "[A-Z][0-9][A-Z] [0-9][A-Z][0-9]")
-Output: Canadian postal code check
-```
-
-## Tips
-
-- Best function for strict input validation.
-
-## Limitations
-
-- Complex patterns can be difficult to maintain.
-- Performance decreases with very long text fields.
-
----
+- Turn this into a **Markdown file** you can drop straight into GitHub, or
+- Generate a **PDF-style layout** (via Markdown or code) ready for printing or sharing.
